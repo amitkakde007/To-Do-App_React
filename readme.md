@@ -1,3 +1,3 @@
 # To-Do-App
 
-To-Do application developed using Django rest API and Vanila-JS. User can create update delete their tasks.
+To-Do application developed using Django rest API and React-JS. User can create update delete their tasks.
