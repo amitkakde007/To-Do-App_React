@@ -1,7 +1,8 @@
 # Django Imports
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import viewsets
+from django.shortcuts import get_object_or_404
 
 # Local Imports
 
@@ -11,21 +12,26 @@ from api.serializers import TaskSerializers
 # Create your views here.
 
 
-class TaskViewAPi(APIView):
+class TaskViewSet(viewsets.ViewSet):
     serializers_class = TaskSerializers
 
-    def get(self, request, *args, **kwargs):
+    def list(self, request, *args, **kwargs):
         queryset = Task.objects.all()
         serializer = self.serializers_class(queryset, many=True)
         return Response(serializer.data)
 
-    def post(self, request, *args, **kwargs):
+    def retrieve(self, request, pk, *args, **kwargs):
+        queryset = get_object_or_404(Task, pk=pk)
+        serializer = self.serializers_class(queryset)
+        return Response(serializer.data)
+
+    def create(self, request, *args, **kwargs):
         serializer = self.serializers_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
 
-    def post(self, request, pk, *args, **kwargs):
-        task=Task.objects.get(id=pk)
+    def update(self, request, pk, *args, **kwargs):
+        task = Task.objects.get(id=pk)
         serializer = self.serializers_class(instance=task, data=request.data)
         if serializer.is_valid():
             serializer.save()
