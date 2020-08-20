@@ -3,6 +3,7 @@ from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from rest_framework import status
 
 # Local Imports
 
@@ -29,13 +30,20 @@ class TaskViewSet(viewsets.ViewSet):
         serializer = self.serializers_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response('Data addedd successfully')
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, pk, *args, **kwargs):
         task = Task.objects.get(id=pk)
         serializer = self.serializers_class(instance=task, data=request.data)
         if serializer.is_valid():
             serializer.save()
+            return Response('Data addedd successfully')
+        else:
+            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, *args, **kwargs):
         queryset = Task.objects.get(id=pk)
         queryset.delete()
+        return Response('Deleted successfully')

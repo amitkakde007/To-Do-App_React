@@ -5,23 +5,20 @@ class List extends Component{
     constructor(props){
         super(props)
         this.state={
-            queryData:[],  
+            queryData:[],
         }
     }
-    ListData(){
+    listData=()=>{
         fetch('http://localhost:8000/api/task-viewset/')
-        .then(response=>response.json())
+            .then(response=>response.json())
         .then(data=>{
             this.setState(
                 {queryData:data}
             )
-        })  
+        })
     }
     componentDidMount(){
-        this.ListData()
-    }
-    componentDidUpdate(){
-        console.log(this.state.queryData)
+        this.listData()
     }
     render(){
         const {queryData}=this.state
@@ -31,10 +28,10 @@ class List extends Component{
                         <span> {data.Title}</span>
                     </div>
                     <div style={{flex:1}}>
-                        <button className="btn btn-sm btn-outline-secondary edit">Edit</button>
+                        <button onClick={()=>this.props.titleHandler(data.id,data.Title)}  className="btn btn-sm btn-outline-secondary edit">Edit</button>
                     </div>
                     <div style={{flex:1}}>
-                        <button className="btn btn-sm btn-outline-danger delete"> Delete</button>
+                        <button onClick={()=>this.props.activeId(data.id)} className="btn btn-sm btn-outline-danger delete"> Delete</button>
                     </div>
                 </div>
             )
