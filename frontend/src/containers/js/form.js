@@ -1,15 +1,16 @@
 import React,{Component} from 'react'
 import '../../containers/css/form.css'
-import axios from 'axios'
+import list from '../../containers/js/list'
+import List from '../../containers/js/list'
 
 class Form extends Component{
 	constructor(props){
 		super(props)
 		this.state={
 			title:'',
+			id:'',
 		}
 	}
-
 	getCookie(name){
 		let cookieValue = null;
 		if (document.cookie && document.cookie !== '') {
@@ -25,37 +26,65 @@ class Form extends Component{
 		}
 		return cookieValue;
 	}
-
 	titleChange=event=>{
-		this.setState({
-			title:event.target.value
-		},console.log(this.state.title))
+		this.setState({title:event.target.value})
 	}
-	formSubmit=event=>{
-		const csrftoken = this.getCookie('csrftoken');
-		let createUrl='http://localhost:8000/api/task-viewset/'
-		axios(createUrl,{
-			method:'POST',
+	titleUpdate=(id,title)=>{
+		this.setState({
+			title:title,
+			id:id,
+		})
+	}
+	formData=(event)=>{
+		let url,httpVerb;
+		let csrftoken = this.getCookie('csrftoken')
+		url='http://localhost:8000/api/task-viewset/'
+		httpVerb='POST'
+		if (this.state.id!==''){
+			url=`http://localhost:8000/api/task-viewset/${this.state.id}/`
+		httpVerb='PUT'
+		}
+		fetch(url,{
+			method:httpVerb,
 			headers:{
 				'Content-type':'application/json',
-				'X-CSRFToken':csrftoken,
+				'X-CSRFToken':csrftoken
 			},
-			body:JSON.stringify({'Title':event.target.value})
-		})
+			body:JSON.stringify({
+				'Title':this.state.title
+			})
+		}).then(this.refs.fetchData.listData(), this.setState({title:'',id:''}))
+		event.preventDefault()
+	}
+	catchActiveId=(id)=>{
+		let csrftoken = this.getCookie('csrftoken')
+		fetch(`http://localhost:8000/api/task-viewset/${id}/`,{
+			method:'DELETE',
+			headers:{
+				'Content-type':'application/json',
+				'X-CSRFToken':csrftoken
+			},
+			body:JSON.stringify({
+				'Title':this.state.title
+			})
+		}).then(this.refs.fetchData.listData(), this.setState({title:'',id:''}))
 	}
 	render(){
 		const {title}=this.state
 		return(
+			<React.Fragment>
 			<form id="formWrapper">
 				<div className="flexWrapper">
 					<div style={{flex: 6}}>
-						<input id="title" className="form-control" type="text" name={title} placeholder="Add task" onChange={this.titleChange} />
+						<input id="title" className="form-control" type="text" value={title} name={title} placeholder="Add task" onChange={this.titleChange} />
 					</div>
 					<div style={{flex: 1}}>
-						<input  className="btn btn-outline-primary" type="submit" onClick={this.formSubmit}/>
+						<input  className="btn btn-outline-primary" type="submit" onClick={this.formData}/>
 	    			</div>
 				</div>
 			</form>
+		<List titleHandler={this.titleUpdate} activeId={this.catchActiveId}ref='fetchData'></List>
+			</React.Fragment>
 		)
 	}
 }
